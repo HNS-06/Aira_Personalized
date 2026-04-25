@@ -4,16 +4,24 @@ import { useFocus } from '../FocusContext';
 import { Zap, ArrowRight, CheckCircle2, Moon, Target, ShieldAlert } from 'lucide-react';
 
 const Onboarding: React.FC = () => {
-  const { stats, nextOnboarding, completeOnboarding } = useFocus();
+  const { stats, nextOnboarding, completeOnboarding, setName } = useFocus();
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<{ text: string; sender: 'aira' | 'user' }[]>([
-    { text: "Hi, I'm Aira. I'm your neural performance partner.", sender: 'aira' },
-    { text: "I'll help you reclaim your focus and optimize your cognitive flow.", sender: 'aira' },
-    { text: "To start, what's your typical sleep schedule? (e.g., 11 PM - 7 AM)", sender: 'aira' }
+    { text: "System initialized. Neural link established.", sender: 'aira' },
+    { text: "Identify yourself. What is your name or designation?", sender: 'aira' }
   ]);
 
   const handleNext = () => {
-    if (stats.onboardingStep === 'intro') {
+    if (stats.onboardingStep === 'name') {
+      setName(inputValue);
+      setMessages(prev => [
+        ...prev, 
+        { text: inputValue, sender: 'user' },
+        { text: `Identity confirmed. Welcome, ${inputValue}.`, sender: 'aira' },
+        { text: "To optimize your cognitive flow, what is your typical sleep schedule? (e.g., 11 PM - 7 AM)", sender: 'aira' }
+      ]);
+      nextOnboarding('intro');
+    } else if (stats.onboardingStep === 'intro') {
       setMessages(prev => [
         ...prev, 
         { text: inputValue, sender: 'user' },

@@ -67,7 +67,7 @@ export default function Dashboard() {
             <div className="flex-1 text-center md:text-left">
               <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
                  <span className="px-2 py-0.5 bg-black text-secondary font-display text-[10px] font-black border border-secondary shadow-[2px_2px_0_0_#000]">LEVEL {stats.level}</span>
-                 <h1 className="font-display text-4xl font-black text-white tracking-tighter uppercase italic leading-none">THE PROTAGONIST</h1>
+                 <h1 className="font-display text-4xl font-black text-white tracking-tighter uppercase italic leading-none">{stats.name || 'THE PROTAGONIST'}</h1>
               </div>
               <p className="font-sans text-[11px] text-slate-500 mb-6 font-black uppercase tracking-widest leading-relaxed">Neural Sync: 94% / Optimization Active / Biorhythm: High Peak</p>
               <div className="grid grid-cols-2 gap-4">

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Aira</string>
+    <string name="title_activity_main">Aira</string>
+    <string name="package_name">com.aira.app</string>
+    <string name="custom_url_scheme">com.aira.app</string>
+</resources>

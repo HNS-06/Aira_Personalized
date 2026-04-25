@@ -3,7 +3,7 @@ import { TrendingUp, BookText, ArrowRight, Activity, AlertTriangle, Zap } from '
 import { useFocus } from '../FocusContext';
 
 export default function Analytics() {
-  const { stats } = useFocus();
+  const { stats, events } = useFocus();
 
   return (
     <div className="space-y-8 pb-12">
@@ -47,12 +47,12 @@ export default function Analytics() {
           {/* SVG Graph Placeholder */}
           <div className="h-64 flex items-end justify-between gap-2 border-b-2 border-black relative mt-12 bg-black/60 rounded-lg p-4 shadow-inner overflow-hidden">
             <div className="absolute inset-0 halftone opacity-10 pointer-events-none" />
-            <svg className="absolute inset-0 w-full h-full p-4" preserveAspectRatio="none">
+            <svg className="absolute inset-0 w-full h-full p-4" preserveAspectRatio="none" viewBox="0 0 1200 240">
               <motion.path 
                 initial={{ pathLength: 0 }}
                 animate={{ pathLength: 1 }}
                 transition={{ duration: 2, ease: "easeInOut" }}
-                d="M0 180 Q 200 120, 400 160 T 800 80 T 1200 120" 
+                d={`M0 ${240 - (events[6]?.xp || 100) / 4} Q 200 ${240 - (events[5]?.xp || 120) / 4}, 400 ${240 - (events[4]?.xp || 160) / 4} T 800 ${240 - (events[2]?.xp || 80) / 4} T 1200 ${240 - (events[0]?.xp || 120) / 4}`} 
                 fill="none" 
                 stroke="#34d399" 
                 strokeWidth="10" 
@@ -137,9 +137,13 @@ export default function Analytics() {
             <span className="label-tag bg-primary text-black">Consistency</span>
             <div className="text-4xl font-display font-black text-primary mb-3 italic">+12%</div>
             <div className="h-6 w-full flex gap-1 items-end pt-2">
-              {[40, 55, 45, 70, 60, 85].map((v, i) => (
-                <div key={i} className={`flex-1 ${i === 5 ? 'bg-primary' : 'bg-slate-700'}`} style={{ height: `${v}%` }} />
-              ))}
+              {stats.level > 0 && Array.from({ length: 6 }).map((_, i) => {
+                const event = events[i];
+                const height = event ? Math.max(10, Math.min(100, (event.xp || 100) / 10)) : 10;
+                return (
+                  <div key={i} className={`flex-1 ${i === 0 ? 'bg-primary' : 'bg-slate-700'}`} style={{ height: `${height}%` }} />
+                );
+              }).reverse()}
             </div>
             <p className="font-display text-[9px] font-black text-slate-500 mt-4 uppercase tracking-widest leading-none">Protagonist Journey Trends</p>
           </div>

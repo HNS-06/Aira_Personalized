@@ -28,6 +28,7 @@ interface FocusContextType {
   closeBreakPrompt: () => void;
   completeOnboarding: () => void;
   nextOnboarding: (step: OnboardingStep) => void;
+  setName: (name: string) => void;
 }
 
 const FocusContext = createContext<FocusContextType | undefined>(undefined);
@@ -45,16 +46,43 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const saved = localStorage.getItem('aira_stats');
     if (saved) return JSON.parse(saved);
     return {
-      level: 42,
-      xp: 12450,
-      xpToNextLevel: 15000,
-      streak: 14,
-      rank: 'ELITE',
-      focusScore: 82,
+      name: '',
+      level: 1,
+      xp: 0,
+      xpToNextLevel: 1000,
+      streak: 1,
+      rank: 'RECRUIT',
+      focusScore: 50,
       isFirstRun: true,
-      onboardingStep: 'intro'
+      onboardingStep: 'name'
     };
   });
+
+  const [lastActivity, setLastActivity] = useState(Date.now());
+
+  useEffect(() => {
+    const handleActivity = () => {
+      setLastActivity(Date.now());
+      if (Math.random() > 0.995) {
+        showAiraNotification("Neural activity detected. Optimizing sync...", "info");
+      }
+    };
+
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+    return () => {
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+    };
+  }, []);
+
+  const setName = useCallback((name: string) => {
+    setStats(prev => {
+      const next = { ...prev, name };
+      localStorage.setItem('aira_stats', JSON.stringify(next));
+      return next;
+    });
+  }, []);
 
   const completeOnboarding = useCallback(() => {
     setStats(prev => {
@@ -90,6 +118,11 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   ]);
 
+  const showAiraNotification = useCallback((message: string, type: 'info' | 'success' | 'warning' = 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  }, []);
+
   const addXP = useCallback((amount: number) => {
     setStats(prev => {
       const newXP = prev.xp + amount;
@@ -105,9 +138,10 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         next = { ...prev, xp: newXP };
       }
       localStorage.setItem('aira_stats', JSON.stringify(next));
+      showAiraNotification(`+${amount} XP Gained`, "success");
       return next;
     });
-  }, []);
+  }, [showAiraNotification]);
 
   const addEvent = useCallback((event: Partial<LifeEvent>) => {
     const newEvent: LifeEvent = {
@@ -127,10 +161,6 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setTotalWorkTimeLeft(seconds);
   }, []);
 
-  const showAiraNotification = useCallback((message: string, type: 'info' | 'success' | 'warning' = 'info') => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 5000);
-  }, []);
 
   const closeBreakPrompt = useCallback(() => {
     setShowBreakPrompt(false);
@@ -264,7 +294,8 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       extendBreak,
       closeBreakPrompt,
       completeOnboarding,
-      nextOnboarding
+      nextOnboarding,
+      setName
     }}>
       {children}
     </FocusContext.Provider>

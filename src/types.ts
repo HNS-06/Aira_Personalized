@@ -18,9 +18,10 @@ export type TabState = 'dashboard' | 'analytics' | 'twin' | 'timeline' | 'privac
 
 export type PomodoroState = 'idle' | 'focus' | 'break' | 'recovery';
 
-export type OnboardingStep = 'intro' | 'goals' | 'distractions' | 'ready';
+export type OnboardingStep = 'name' | 'intro' | 'goals' | 'distractions' | 'ready';
 
 export interface UserStats {
+  name: string;
   level: number;
   xp: number;
   xpToNextLevel: number;
