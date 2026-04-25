@@ -1,0 +1,254 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  LayoutDashboard, 
+  BarChart3, 
+  UserCircle2, 
+  History, 
+  Settings,
+  MessageSquare,
+  X,
+  Zap,
+  Play,
+  Pause,
+  AlertCircle,
+  Shield
+} from 'lucide-react';
+import { TabState } from './types.ts';
+import { FocusProvider, useFocus } from './FocusContext';
+
+import Dashboard from './components/Dashboard';
+import Analytics from './components/Analytics';
+import DigitalTwin from './components/DigitalTwin';
+import Timeline from './components/Timeline';
+import Onboarding from './components/Onboarding';
+import Privacy from './components/Privacy';
+import AiraNotification from './components/AiraNotification';
+
+function AppContent() {
+  const [activeTab, setActiveTab] = useState<TabState>('dashboard');
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const { isFocusMode, activeState, timeLeft, totalWorkTimeLeft, stopFocus, setFocusMode, stats } = useFocus();
+
+  const navItems = [
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { id: 'analytics', icon: BarChart3, label: 'Analytics' },
+    { id: 'twin', icon: UserCircle2, label: 'Avatar' },
+    { id: 'timeline', icon: History, label: 'History' },
+    { id: 'privacy', icon: Shield, label: 'Privacy' },
+  ];
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className={`min-h-screen bg-background selection:bg-primary/30 selection:text-white transition-all duration-1000 ${isFocusMode ? 'focus-mode-active' : ''}`}>
+      {/* Onboarding Overlay */}
+      {stats.isFirstRun && <Onboarding />}
+
+      {/* Focus Mode Overlay */}
+      <AnimatePresence>
+        {isFocusMode && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center pointer-events-none"
+          >
+            <div className="absolute inset-0 bg-primary/5 animate-pulse overflow-hidden">
+               <div className="absolute inset-0 halftone opacity-20" />
+            </div>
+            <div className="text-center z-10 mb-8">
+               <p className="text-primary/60 font-display text-[10px] font-black uppercase tracking-[0.6em] mb-2">Workspace Remaining</p>
+               <h3 className="text-white font-display text-2xl font-black italic uppercase tracking-tighter">
+                {formatTime(totalWorkTimeLeft)}
+               </h3>
+            </div>
+            <motion.div 
+               animate={{ scale: [1, 1.05, 1] }}
+               transition={{ duration: 4, repeat: Infinity }}
+               className="text-primary font-display text-[120px] font-black italic tracking-tighter drop-shadow-[0_0_50px_rgba(96,165,250,0.5)] z-10"
+            >
+              {formatTime(timeLeft)}
+            </motion.div>
+            <p className="text-white/40 font-display text-xs font-black uppercase tracking-[0.5em] mt-4 z-10">Neural Flow Active</p>
+            <div className="pointer-events-auto mt-12 z-10">
+               <button 
+                onClick={() => setFocusMode(false)}
+                className="px-8 py-3 border-2 border-white/10 text-white/50 hover:text-white hover:border-white/40 font-display text-[10px] font-black uppercase tracking-widest rounded transition-all"
+               >
+                 Exit Focus Space
+               </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AiraNotification />
+
+      {/* Top Bar */}
+      <header className="fixed top-0 left-0 w-full z-50 px-6 h-16 bg-slate-900 border-b-3 border-black flex justify-between items-center shadow-[0_4px_0_0_#000]">
+        <div className="flex items-center gap-4">
+          <div className="text-2xl font-black tracking-tighter italic font-display flex items-center gap-3">
+            AIRA <span className="text-primary font-mono text-xs not-italic tracking-normal">AI CORE v1.0</span>
+          </div>
+          <div className="h-4 w-px bg-slate-700 hidden md:block"></div>
+          <div className="hidden md:flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse" />
+            <span className="text-[10px] font-black text-secondary uppercase tracking-widest">System Online: Synced</span>
+          </div>
+        </div>
+
+        <div className="hidden md:flex gap-8">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id as TabState)}
+              className={`font-display font-black text-[10px] uppercase tracking-[0.2em] transition-all border-b-2 pb-1 ${
+                activeTab === item.id ? 'text-primary border-primary' : 'text-slate-500 border-transparent hover:text-white'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-4 items-center">
+          <div className="hidden lg:block text-right">
+             <div className="text-[9px] opacity-50 uppercase font-black tracking-tighter">Primary Mode</div>
+             <div className="text-xs font-bold text-warning">HIGH-ENERGY FOCUS</div>
+          </div>
+          <button className="text-slate-400 hover:text-primary transition-all p-2 bg-black/20 border border-white/5 rounded">
+            <Settings size={18} />
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="pt-24 pb-32 px-6 max-w-7xl mx-auto min-h-screen">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            {activeTab === 'dashboard' && <Dashboard />}
+            {activeTab === 'analytics' && <Analytics />}
+            {activeTab === 'twin' && <DigitalTwin />}
+            {activeTab === 'timeline' && <Timeline />}
+            {activeTab === 'privacy' && <Privacy />}
+          </motion.div>
+        </AnimatePresence>
+      </main>
+
+      {/* Floating Assistant Trigger */}
+      <button 
+        onClick={() => setIsAssistantOpen(true)}
+        className="fixed right-6 bottom-24 w-14 h-14 bg-primary text-on-primary rounded-full shadow-[0_0_30px_rgba(183,109,255,0.4)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40 border-2 border-background"
+      >
+        <MessageSquare size={24} />
+      </button>
+
+      {/* Assistant Modal/Panel */}
+      <AnimatePresence>
+        {isAssistantOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsAssistantOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 h-full w-full max-w-md bg-surface border-l border-white/10 z-[70] p-6 shadow-2xl"
+            >
+              <div className="flex justify-between items-center mb-8">
+                <div className="flex items-center gap-3">
+                   <div className="p-2 bg-primary text-black rounded">
+                      <Zap size={20} fill="currentColor" />
+                   </div>
+                   <h3 className="text-xl font-black font-display uppercase italic">Aira Coach</h3>
+                </div>
+                <button 
+                  onClick={() => setIsAssistantOpen(false)}
+                  className="p-2 hover:bg-white/5 border border-white/10 rounded"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="space-y-6">
+                <div className="p-6 bg-black/40 border-2 border-black rounded shadow-[6px_6px_0_0_#000] relative">
+                  <div className="absolute -top-3 left-6 px-2 bg-primary text-black font-display text-[9px] font-black uppercase">Current Analysis</div>
+                  <p className="text-primary font-bold mb-4 italic text-sm border-l-2 border-primary pl-3">"I've noticed your focus level is stabilizing. You're enterning a peak creative window based on your last 14 days of performance."</p>
+                  <div className="flex items-center gap-3 mt-4 text-[10px] font-black text-slate-500 uppercase">
+                     <AlertCircle size={14} className="text-warning" />
+                     <span>Hydration priority: Low (Drink 250ml)</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                  <button className="flex items-center justify-between p-4 bg-primary text-black rounded font-black text-xs uppercase tracking-widest shadow-[4px_4px_0_0_#000] group">
+                    Start Protocol Horizon
+                    <Play size={14} fill="currentColor" className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  <button className="p-4 border-2 border-black text-white hover:bg-white/5 rounded font-black text-xs uppercase tracking-widest transition-all">
+                    Reschedule Gym Session
+                  </button>
+                  <button className="p-4 border-2 border-dashed border-white/10 text-slate-500 rounded font-black text-[10px] uppercase tracking-widest">
+                    Request Deep Audit...
+                  </button>
+                </div>
+
+                <div className="pt-8 border-t border-white/5">
+                   <div className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-4">Behavioral Insight</div>
+                   <div className="comic-panel p-4 rounded bg-slate-900">
+                      <p className="text-[11px] font-bold text-slate-300 leading-relaxed uppercase">You are 22% more productive when your ambient light is set to 4000K. Adjusting hardware now...</p>
+                   </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Bottom Mobile Nav */}
+      <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-8 pt-3 bg-slate-950/90 backdrop-blur-2xl border-t border-black md:hidden">
+        {navItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => setActiveTab(item.id as TabState)}
+            className={`flex flex-col items-center gap-1 transition-all ${
+              activeTab === item.id ? 'text-primary' : 'text-slate-500 hover:text-slate-300'
+            }`}
+          >
+            <item.icon size={20} />
+            <span className="font-display text-[10px] font-black uppercase tracking-widest">{item.label}</span>
+          </button>
+        ))}
+      </nav>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <FocusProvider>
+      <AppContent />
+    </FocusProvider>
+  );
+}

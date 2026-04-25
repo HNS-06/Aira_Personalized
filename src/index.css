@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700;900&family=Bangers&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-background: #080a0f;
+  --color-surface: #121826;
+  --color-primary: #7c3aed; /* vibrant deep purple */
+  --color-secondary: #00f5ff; /* neon cyan */
+  --color-tertiary: #a855f7; 
+  --color-error: #ff2d55; 
+  --color-warning: #ffcc00; 
+  --color-on-background: #FFFFFF;
+  
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-comic: "Bangers", cursive;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-on-background font-sans overflow-x-hidden;
+    background-image: 
+      radial-gradient(rgba(124, 58, 237, 0.05) 1px, transparent 0),
+      linear-gradient(rgba(8, 10, 15, 0.9), rgba(8, 10, 15, 0.9));
+    background-size: 30px 30px;
+  }
+}
+
+@layer components {
+  .comic-panel {
+    @apply bg-surface border-4 border-black shadow-[10px_10px_0px_0px_#000] relative;
+  }
+  
+  .halftone {
+    background-image: radial-gradient(#000 15%, transparent 20%);
+    background-size: 4px 4px;
+    mask-image: linear-gradient(to bottom, black, transparent);
+  }
+
+  .label-tag {
+    @apply absolute -top-4 left-6 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white border-2 border-black z-20 shadow-[4px_4px_0_0_#000] rounded-sm;
+  }
+
+  .neon-glow {
+    @apply shadow-[0_0_30px_rgba(124,58,237,0.4)];
+  }
+}

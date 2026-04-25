@@ -1,0 +1,9 @@
+{
+  "name": "Aira",
+  "description": "Premium AI-powered productivity system focusing on deep work, behavior tracking, and intelligent coaching.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
