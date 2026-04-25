@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { PomodoroState, UserStats, LifeEvent, OnboardingStep } from './types';
+import { playAudioCue } from './utils/audio';
 
 interface Notification {
   message: string;
@@ -158,6 +159,7 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setTimeLeft(duration);
     setTotalDuration(duration);
     setIsFocusMode(true);
+    playAudioCue('start');
     addEvent({ 
       title: 'Aira Focus Protocol', 
       description: `Optimized session: ${Math.floor(duration / 60)} minutes based on behavior patterns.`, 
@@ -170,15 +172,24 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setTimeLeft(0);
     setTotalWorkTimeLeft(0);
     setIsFocusMode(false);
+    playAudioCue('warning');
     addEvent({ title: 'Focus Protocol Terminated', description: 'Session ended manually.', type: 'rest' });
   }, [addEvent]);
 
   const triggerDistraction = useCallback(() => {
     if (activeState === 'focus') {
       addXP(-50);
+      playAudioCue('warning');
       addEvent({ title: 'System Distraction', description: 'Unauthorized attention drift detected.', type: 'distraction' });
     }
   }, [activeState, addXP, addEvent]);
+
+  useEffect(() => {
+    // Request native notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
 
   useEffect(() => {
     let timer: number;
@@ -195,14 +206,38 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setTotalDuration(5 * 60);
       addXP(500);
       showAiraNotification("You can take a break", "success");
+      playAudioCue('complete');
+      
+      // Native Notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Aira AI Core', {
+          body: 'Deep Work session complete. Initiating neural rest sequence.',
+          icon: '/favicon.svg'
+        });
+      }
+
       addEvent({ title: 'Session Complete', description: 'Focus goal reached. Initializing break.', type: 'rest', xp: 500 });
     } else if (timeLeft === 0 && activeState === 'break') {
       if (totalWorkTimeLeft > 0) {
         setShowBreakPrompt(true);
+        playAudioCue('start');
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('Aira AI Core', {
+            body: 'Break complete. Ready to re-enter flow space?',
+            icon: '/favicon.svg'
+          });
+        }
       } else {
         setActiveState('idle');
         setIsFocusMode(false);
         showAiraNotification("Total Work Session Complete!", "success");
+        playAudioCue('complete');
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('Aira AI Core', {
+            body: 'Total Protocol complete. Excellent work.',
+            icon: '/favicon.svg'
+          });
+        }
       }
     }
     return () => clearInterval(timer);
