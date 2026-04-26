@@ -1,4 +1,4 @@
-export function playAudioCue(type: 'start' | 'complete' | 'warning' | 'click') {
+export function playAudioCue(type: 'start' | 'complete' | 'warning' | 'click' | 'alarm') {
   if (typeof window === 'undefined' || !window.AudioContext && !(window as any).webkitAudioContext) return;
   
   try {
@@ -51,6 +51,28 @@ export function playAudioCue(type: 'start' | 'complete' | 'warning' | 'click') {
       gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + 0.05);
+    } else if (type === 'alarm') {
+      // Three pulsing beeps — break reminder alarm
+      osc.type = 'sine';
+      const beepFreq = 880; // A5 — attention-grabbing
+      gainNode.gain.setValueAtTime(0, ctx.currentTime);
+      // Beep 1
+      osc.frequency.setValueAtTime(beepFreq, ctx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+      gainNode.gain.setValueAtTime(0.18, ctx.currentTime + 0.15);
+      gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.2);
+      // Beep 2
+      osc.frequency.setValueAtTime(beepFreq, ctx.currentTime + 0.35);
+      gainNode.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.37);
+      gainNode.gain.setValueAtTime(0.18, ctx.currentTime + 0.5);
+      gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.55);
+      // Beep 3 (slightly higher)
+      osc.frequency.setValueAtTime(1046.5, ctx.currentTime + 0.7); // C6
+      gainNode.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.72);
+      gainNode.gain.setValueAtTime(0.2, ctx.currentTime + 0.95);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 1.2);
     }
   } catch (e) {
     console.warn("Audio Context failed or was blocked by browser policy.");

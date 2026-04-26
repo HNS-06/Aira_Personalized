@@ -201,7 +201,7 @@ export default function DigitalTwin() {
                   emotion === 'sighing' ? 'opacity-70 contrast-75' :
                   'grayscale'
                 }`} 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVcM1pciFbnWy1lEfEnccI2VLQOKoGjOLuuQ5PUhSQ83mTrIEjMgsmnZtB3fKigBHB7J-r1kO-897GwaN3HHmngguK5kQwpun-kYgJij_ibm8Q0WmGBnezKFbfD3hvbawms6kl_wy-0OW3ImaklxVi_5rk1qdkpwUmdIzmJDGV9_JPK3Apv2v3G2aS37XbbitGLcftj_qX3TgRUsFcS98PissX_8lDkAkhyc8cA_A_WQTLwV1unMVxvX0B013kB30WWrgCnxhNHtSu" 
+                src="/aira-avatar.png" 
               />
             </motion.div>
           </div>

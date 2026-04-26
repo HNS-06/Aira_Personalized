@@ -58,7 +58,7 @@ export default function Dashboard() {
                   <img 
                     alt="Aira Avatar" 
                     className="w-full h-full object-cover scale-110 grayscale rounded-full" 
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVcM1pciFbnWy1lEfEnccI2VLQOKoGjOLuuQ5PUhSQ83mTrIEjMgsmnZtB3fKigBHB7J-r1kO-897GwaN3HHmngguK5kQwpun-kYgJij_ibm8Q0WmGBnezKFbfD3hvbawms6kl_wy-0OW3ImaklxVi_5rk1qdkpwUmdIzmJDGV9_JPK3Apv2v3G2aS37XbbitGLcftj_qX3TgRUsFcS98PissX_8lDkAkhyc8cA_A_WQTLwV1unMVxvX0B013kB30WWrgCnxhNHtSu" 
+                    src="/aira-avatar.png" 
                   />
                 </div>
                 <div className="absolute w-4 h-4 bg-white rounded-full animate-ping top-6 right-6" />

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { PomodoroState, UserStats, LifeEvent, OnboardingStep } from './types';
 import { playAudioCue } from './utils/audio';
 
@@ -42,6 +42,8 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [totalWorkTimeLeft, setTotalWorkTimeLeft] = useState(0);
   const [notification, setNotification] = useState<Notification | null>(null);
   const [showBreakPrompt, setShowBreakPrompt] = useState(false);
+  const [focusElapsed, setFocusElapsed] = useState(0);
+  const [twentyMinAlertFired, setTwentyMinAlertFired] = useState(false);
   const [stats, setStats] = useState<UserStats>(() => {
     const saved = localStorage.getItem('aira_stats');
     if (saved) return JSON.parse(saved);
@@ -189,6 +191,8 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setTimeLeft(duration);
     setTotalDuration(duration);
     setIsFocusMode(true);
+    setFocusElapsed(0);
+    setTwentyMinAlertFired(false);
     playAudioCue('start');
     addEvent({ 
       title: 'Aira Focus Protocol', 
@@ -228,6 +232,7 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setTimeLeft(prev => prev - 1);
         if (activeState === 'focus') {
           setTotalWorkTimeLeft(prev => Math.max(0, prev - 1));
+          setFocusElapsed(prev => prev + 1);
         }
       }, 1000);
     } else if (timeLeft === 0 && activeState === 'focus') {
@@ -272,6 +277,21 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
     return () => clearInterval(timer);
   }, [activeState, timeLeft, addXP, addEvent, totalWorkTimeLeft, showAiraNotification]);
+
+  // 20-minute focus milestone alarm
+  useEffect(() => {
+    if (activeState === 'focus' && focusElapsed === 20 * 60 && !twentyMinAlertFired) {
+      setTwentyMinAlertFired(true);
+      playAudioCue('alarm');
+      showAiraNotification("20 minutes done â€” you can take a break!", "success");
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Aira AI Core', {
+          body: '20 minutes of deep focus complete. You can take a break!',
+          icon: '/aira-avatar.png'
+        });
+      }
+    }
+  }, [focusElapsed, activeState, twentyMinAlertFired, showAiraNotification]);
 
   return (
     <FocusContext.Provider value={{
