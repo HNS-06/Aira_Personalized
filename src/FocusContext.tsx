@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { PomodoroState, UserStats, LifeEvent, OnboardingStep } from './types';
 import { playAudioCue } from './utils/audio';
 
@@ -29,6 +29,7 @@ interface FocusContextType {
   completeOnboarding: () => void;
   nextOnboarding: (step: OnboardingStep) => void;
   setName: (name: string) => void;
+  showAiraNotification: (message: string, type?: 'info' | 'success' | 'warning') => void;
 }
 
 const FocusContext = createContext<FocusContextType | undefined>(undefined);
@@ -255,7 +256,7 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } else if (timeLeft === 0 && activeState === 'break') {
       if (totalWorkTimeLeft > 0) {
         setShowBreakPrompt(true);
-        playAudioCue('start');
+        playAudioCue('alarm');
         if ('Notification' in window && Notification.permission === 'granted') {
           new Notification('Aira AI Core', {
             body: 'Break complete. Ready to re-enter flow space?',
@@ -315,7 +316,8 @@ export const FocusProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       closeBreakPrompt,
       completeOnboarding,
       nextOnboarding,
-      setName
+      setName,
+      showAiraNotification
     }}>
       {children}
     </FocusContext.Provider>

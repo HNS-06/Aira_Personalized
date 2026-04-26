@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Terminal, BookOpen, Smartphone, LayoutGrid, Zap, Play, Square, RefreshCcw } from 'lucide-react';
 import { useFocus } from '../FocusContext';
@@ -14,8 +15,24 @@ export default function Dashboard() {
     setTotalWorkTime
   } = useFocus();
 
+  const [customTimeInput, setCustomTimeInput] = useState('');
+
   const handleSetTime = (mins: number) => {
-    setTotalWorkTime(mins * 60);
+    if (totalWorkTime === mins * 60) {
+      setTotalWorkTime(0);
+    } else {
+      setTotalWorkTime(mins * 60);
+      setCustomTimeInput('');
+    }
+  };
+
+  const handleCustomTimeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const mins = parseInt(customTimeInput);
+    if (!isNaN(mins) && mins > 0) {
+      setTotalWorkTime(mins * 60);
+      setCustomTimeInput('');
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -155,20 +172,35 @@ export default function Dashboard() {
 
           <div className="mt-12 flex flex-col gap-4 w-full px-6">
             {activeState === 'idle' && (
-              <div className="grid grid-cols-3 gap-2 mb-2">
-                {[60, 120, 180].map((mins) => (
-                  <button
-                    key={mins}
-                    onClick={() => handleSetTime(mins)}
-                    className={`py-2 px-1 rounded border-2 font-display text-[9px] font-black uppercase tracking-widest transition-all ${
-                      totalWorkTime === mins * 60 
-                        ? 'bg-primary text-black border-black shadow-[2px_2px_0_0_#000]' 
-                        : 'bg-black/40 text-slate-500 border-white/5 hover:border-primary/40'
-                    }`}
-                  >
-                    {mins / 60} HOUR{mins > 60 ? 'S' : ''}
+              <div className="flex flex-col gap-2 mb-2">
+                <div className="grid grid-cols-3 gap-2">
+                  {[60, 120, 180].map((mins) => (
+                    <button
+                      key={mins}
+                      onClick={() => handleSetTime(mins)}
+                      className={`py-2 px-1 rounded border-2 font-display text-[9px] font-black uppercase tracking-widest transition-all ${
+                        totalWorkTime === mins * 60 
+                          ? 'bg-primary text-black border-black shadow-[2px_2px_0_0_#000]' 
+                          : 'bg-black/40 text-slate-500 border-white/5 hover:border-primary/40'
+                      }`}
+                    >
+                      {mins / 60} HOUR{mins > 60 ? 'S' : ''}
+                    </button>
+                  ))}
+                </div>
+                <form onSubmit={handleCustomTimeSubmit} className="flex gap-2 w-full mt-2">
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="CUSTOM MINS"
+                    value={customTimeInput}
+                    onChange={(e) => setCustomTimeInput(e.target.value)}
+                    className="flex-1 bg-black/40 text-white font-display text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded border-2 border-white/5 focus:border-primary/40 outline-none w-full"
+                  />
+                  <button type="submit" className="bg-primary text-black font-display text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded shadow-[2px_2px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all">
+                    SET
                   </button>
-                ))}
+                </form>
               </div>
             )}
             {activeState === 'idle' ? (

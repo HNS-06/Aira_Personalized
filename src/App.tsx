@@ -29,6 +29,7 @@ import Timeline from './components/Timeline';
 import Onboarding from './components/Onboarding';
 import Privacy from './components/Privacy';
 import AiraNotification from './components/AiraNotification';
+import AiraAssistant from './components/AiraAssistant';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<TabState>('dashboard');
@@ -126,21 +127,25 @@ function AppContent() {
              <div className="text-[9px] opacity-50 uppercase font-black tracking-tighter">Primary Mode</div>
              <div className="text-xs font-bold text-warning">HIGH-ENERGY FOCUS</div>
           </div>
-          <button className="text-slate-400 hover:text-primary transition-all p-2 bg-black/20 border border-white/5 rounded">
+          <button 
+            onClick={() => setActiveTab('privacy')}
+            className="text-slate-400 hover:text-primary transition-all p-2 bg-black/20 border border-white/5 rounded"
+          >
             <Settings size={18} />
           </button>
         </div>
       </header>
 
       {/* Main Content Area */}
-      <main className="pt-24 pb-32 px-6 max-w-7xl mx-auto min-h-screen">
-        <AnimatePresence mode="wait">
+      <main className="pt-24 pb-32 px-6 max-w-7xl mx-auto min-h-screen grid">
+        <AnimatePresence>
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            className="col-start-1 row-start-1 w-full"
           >
             {activeTab === 'dashboard' && <Dashboard />}
             {activeTab === 'analytics' && <Analytics />}
@@ -170,58 +175,7 @@ function AppContent() {
               onClick={() => setIsAssistantOpen(false)}
               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
             />
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-full max-w-md bg-surface border-l border-white/10 z-[70] p-6 shadow-2xl"
-            >
-              <div className="flex justify-between items-center mb-8">
-                <div className="flex items-center gap-3">
-                   <div className="p-2 bg-primary text-black rounded">
-                      <Zap size={20} fill="currentColor" />
-                   </div>
-                   <h3 className="text-xl font-black font-display uppercase italic">Aira Coach</h3>
-                </div>
-                <button 
-                  onClick={() => setIsAssistantOpen(false)}
-                  className="p-2 hover:bg-white/5 border border-white/10 rounded"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="space-y-6">
-                <div className="p-6 bg-black/40 border-2 border-black rounded shadow-[6px_6px_0_0_#000] relative">
-                  <div className="absolute -top-3 left-6 px-2 bg-primary text-black font-display text-[9px] font-black uppercase">Current Analysis</div>
-                  <p className="text-primary font-bold mb-4 italic text-sm border-l-2 border-primary pl-3">"I've noticed your focus level is stabilizing. You're enterning a peak creative window based on your last 14 days of performance."</p>
-                  <div className="flex items-center gap-3 mt-4 text-[10px] font-black text-slate-500 uppercase">
-                     <AlertCircle size={14} className="text-warning" />
-                     <span>Hydration priority: Low (Drink 250ml)</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-3">
-                  <button className="flex items-center justify-between p-4 bg-primary text-black rounded font-black text-xs uppercase tracking-widest shadow-[4px_4px_0_0_#000] group">
-                    Start Protocol Horizon
-                    <Play size={14} fill="currentColor" className="group-hover:translate-x-1 transition-transform" />
-                  </button>
-                  <button className="p-4 border-2 border-black text-white hover:bg-white/5 rounded font-black text-xs uppercase tracking-widest transition-all">
-                    Reschedule Gym Session
-                  </button>
-                  <button className="p-4 border-2 border-dashed border-white/10 text-slate-500 rounded font-black text-[10px] uppercase tracking-widest">
-                    Request Deep Audit...
-                  </button>
-                </div>
-
-                <div className="pt-8 border-t border-white/5">
-                   <div className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-4">Behavioral Insight</div>
-                   <div className="comic-panel p-4 rounded bg-slate-900">
-                      <p className="text-[11px] font-bold text-slate-300 leading-relaxed uppercase">You are 22% more productive when your ambient light is set to 4000K. Adjusting hardware now...</p>
-                   </div>
-                </div>
-              </div>
-            </motion.div>
+            <AiraAssistant onClose={() => setIsAssistantOpen(false)} />
           </>
         )}
       </AnimatePresence>

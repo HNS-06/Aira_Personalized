@@ -3,7 +3,7 @@ import { TrendingUp, BookText, ArrowRight, Activity, AlertTriangle, Zap } from '
 import { useFocus } from '../FocusContext';
 
 export default function Analytics() {
-  const { stats, events } = useFocus();
+  const { stats, events, showAiraNotification } = useFocus();
 
   return (
     <div className="space-y-8 pb-12">
@@ -16,8 +16,8 @@ export default function Analytics() {
             <p className="font-sans text-sm text-slate-400 max-w-2xl font-bold uppercase tracking-tight">Systematic review of your deep work arc / Aira Sync active</p>
           </div>
           <div className="flex gap-3">
-            <button className="px-6 py-3 bg-secondary text-black font-display text-[10px] font-black uppercase tracking-widest rounded shadow-[4px_4px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all">WEEKLY SUMMARY</button>
-            <button className="px-6 py-3 bg-slate-800 border-2 border-black text-white font-display text-[10px] font-black uppercase tracking-widest rounded shadow-[4px_4px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all">SHARE PERFORMANCE</button>
+            <button onClick={() => showAiraNotification('Compiling weekly summary... Report will be delivered to your hub.', 'info')} className="px-6 py-3 bg-secondary text-black font-display text-[10px] font-black uppercase tracking-widest rounded shadow-[4px_4px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all">WEEKLY SUMMARY</button>
+            <button onClick={() => showAiraNotification('Performance stats copied to clipboard. Ready to share!', 'success')} className="px-6 py-3 bg-slate-800 border-2 border-black text-white font-display text-[10px] font-black uppercase tracking-widest rounded shadow-[4px_4px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all">SHARE PERFORMANCE</button>
           </div>
         </div>
       </section>
@@ -95,17 +95,17 @@ export default function Analytics() {
                <div className="absolute inset-0 bg-secondary/10 z-10" />
               <img 
                 className="w-full h-full object-cover transition-all duration-700 grayscale group-hover:grayscale-0 group-hover:scale-110" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnszTVb4_B8UmrHPVlivz5UcMXkd4Yx44knuYertahX-H3c9RsFb-jHsh40q3fzx3I5TzCCOfRYZMgmFFpILMN46qHvSCrThkrrV8Z2TaabkApWyDEIDG1V3c4M0G3q91eeTf3rLGJGEveL0gbHEArXO6zB1euolDwgyotDkri3W4D5G72ywCD7w45xjE196uuZbGHLcs8nFYS3kj3XKnyslqVXLVeyntinLIkAoEF2ZWwQE3ds6bZETCd9qha9zT53eCeo5WRSkJP" 
+                src="/aira-narrative.png" 
                 alt="Narrative style" 
               />
             </div>
             <div className="bg-black/60 p-6 rounded border-2 border-black">
                <p className="font-sans text-[11px] text-slate-300 font-bold italic uppercase leading-relaxed tracking-wider">
-                "System identified a 32% creative efficiency gain during your nocturnal window. Aira recommends shifting heavy synthesis tasks to 10 PM."
+                "System identified a {stats.focusScore > 80 ? 'peak' : 'moderate'} creative efficiency phase based on recent XP gains. Aira recommends maintaining your {stats.streak}-day streak."
               </p>
             </div>
           </div>
-          <button className="w-full mt-10 py-5 bg-primary text-black transition-all font-display text-[11px] font-black uppercase tracking-widest rounded shadow-[6px_6px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none flex items-center justify-center gap-3 group">
+          <button onClick={() => showAiraNotification('Generating full neural report. This may take a moment...', 'info')} className="w-full mt-10 py-5 bg-primary text-black transition-all font-display text-[11px] font-black uppercase tracking-widest rounded shadow-[6px_6px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none flex items-center justify-center gap-3 group">
             GENERAL NEURAL REPORT
             <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" strokeWidth={3} />
           </button>
@@ -115,9 +115,9 @@ export default function Analytics() {
         <div className="col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="comic-panel rounded-lg p-6 flex flex-col items-center text-center bg-slate-900 border-t-6 border-t-secondary">
             <span className="label-tag bg-secondary text-black">Restore State</span>
-            <div className="text-4xl font-display font-black text-secondary mb-3 italic">84%</div>
+            <div className="text-4xl font-display font-black text-secondary mb-3 italic">{Math.min(100, stats.focusScore + 10)}%</div>
             <div className="h-4 w-full bg-black p-1 border border-white/10 rounded flex">
-              <div className="h-full bg-secondary" style={{ width: '84%', backgroundImage: 'linear-gradient(90deg, transparent 75%, rgba(0,0,0,0.3) 75%)', backgroundSize: '8px 100%' }} />
+              <div className="h-full bg-secondary" style={{ width: `${Math.min(100, stats.focusScore + 10)}%`, backgroundImage: 'linear-gradient(90deg, transparent 75%, rgba(0,0,0,0.3) 75%)', backgroundSize: '8px 100%' }} />
             </div>
             <p className="font-display text-[9px] font-black text-slate-500 mt-4 uppercase tracking-widest leading-none">Sleep Efficiency Optimized</p>
           </div>
@@ -135,7 +135,7 @@ export default function Analytics() {
 
           <div className="comic-panel rounded-lg p-6 flex flex-col items-center text-center bg-slate-900 border-t-6 border-t-primary">
             <span className="label-tag bg-primary text-black">Consistency</span>
-            <div className="text-4xl font-display font-black text-primary mb-3 italic">+12%</div>
+            <div className="text-4xl font-display font-black text-primary mb-3 italic">+{stats.streak * 2}%</div>
             <div className="h-6 w-full flex gap-1 items-end pt-2">
               {stats.level > 0 && Array.from({ length: 6 }).map((_, i) => {
                 const event = events[i];

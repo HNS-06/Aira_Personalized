@@ -73,7 +73,7 @@ const EMOTIONS: Record<Emotion, EmotionConfig> = {
 };
 
 export default function DigitalTwin() {
-  const { activeState, stats, startFocus, extendBreak } = useFocus();
+  const { activeState, stats, startFocus, extendBreak, showAiraNotification } = useFocus();
   const [emotion, setEmotion] = useState<Emotion>('idle');
   const [insight, setInsight] = useState<string>('');
   const prevActiveState = useRef(activeState);
@@ -110,6 +110,15 @@ export default function DigitalTwin() {
   }, [activeState]);
 
   const config = EMOTIONS[emotion] || EMOTIONS.idle;
+
+  const getFocusEnergy = () => {
+    if (emotion === 'determined') return 100;
+    if (emotion === 'overwhelmed') return 12;
+    if (emotion === 'distracted') return Math.max(10, stats.focusScore - 40);
+    return stats.focusScore;
+  };
+  const energyPercent = getFocusEnergy();
+  const activeBars = Math.ceil((energyPercent / 100) * 8);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
@@ -230,7 +239,7 @@ export default function DigitalTwin() {
               <div className="flex justify-between mb-2">
                 <span className="font-display text-[9px] font-black text-slate-500 uppercase tracking-widest">Focus Energy</span>
                 <span className={`font-display text-[10px] font-black transition-colors duration-1000 ${config.color}`}>
-                  {emotion === 'focused' ? '88%' : emotion === 'overwhelmed' ? '12%' : emotion === 'determined' ? '100%' : '45%'}
+                  {energyPercent}%
                 </span>
               </div>
               <div className="w-full h-3 bg-black border border-white/10 p-0.5 rounded flex gap-0.5">
@@ -238,10 +247,9 @@ export default function DigitalTwin() {
                   <motion.div 
                     key={s} 
                     animate={{ 
-                      backgroundColor: (emotion === 'focused' && s <= 7) ? '#34d399' : 
-                                      (emotion === 'overwhelmed' && s <= 1) ? '#fb7185' : 
-                                      (emotion === 'determined' && s <= 8) ? '#00f5ff' :
-                                      (emotion === 'distracted' && s <= 4) ? '#fbbf24' : '#1e293b'
+                      backgroundColor: s <= activeBars 
+                        ? (emotion === 'overwhelmed' ? '#fb7185' : emotion === 'determined' ? '#00f5ff' : emotion === 'distracted' ? '#fbbf24' : '#34d399')
+                        : '#1e293b'
                     }}
                     className="flex-1 rounded-sm transition-colors duration-1000" 
                   />
@@ -285,7 +293,7 @@ export default function DigitalTwin() {
           </div>
           <div className="mt-8 flex gap-3">
             <button onClick={() => extendBreak(5 * 60)} className="flex-1 py-3 bg-error text-black font-display text-[10px] font-black uppercase tracking-widest rounded shadow-[4px_4px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all">EXECUTE REST</button>
-            <button className="flex-1 py-3 bg-slate-800 border-2 border-black text-white font-display text-[10px] font-black uppercase tracking-widest rounded shadow-[4px_4px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all">DENY</button>
+            <button onClick={() => showAiraNotification('Rest sequence denied. Reverting to active monitoring.', 'warning')} className="flex-1 py-3 bg-slate-800 border-2 border-black text-white font-display text-[10px] font-black uppercase tracking-widest rounded shadow-[4px_4px_0_0_#000] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all">DENY</button>
           </div>
         </motion.div>
       </section>
@@ -348,7 +356,7 @@ export default function DigitalTwin() {
                 <h4 className="font-display text-lg font-black text-white mb-1 uppercase italic">Mindfulness Reset</h4>
                 <p className="font-sans text-[11px] text-slate-400 font-bold uppercase">Cortisol Delta Detected / High Load Alert.</p>
               </div>
-              <button className="whitespace-nowrap px-8 py-4 bg-slate-800 border-2 border-black text-white font-display text-[10px] font-black uppercase tracking-widest rounded shadow-[6px_6px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+              <button onClick={() => showAiraNotification('Mindfulness sequence initiated. Please stand by.', 'info')} className="whitespace-nowrap px-8 py-4 bg-slate-800 border-2 border-black text-white font-display text-[10px] font-black uppercase tracking-widest rounded shadow-[6px_6px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
                 RUN SEQUENCE
               </button>
             </div>
